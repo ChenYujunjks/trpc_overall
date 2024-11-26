@@ -3,10 +3,22 @@
 import { useState } from "react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
+import { trpc } from "@/components/provider";
 
 export default function SigninForm() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+
+  // tRPC Mutation
+  const signInMutation = trpc.signIn.useMutation({
+    onSuccess: (data) => {
+      console.log(data.message); // 可选：显示成功消息
+      window.location.href = "/"; // 登录成功后跳转
+    },
+    onError: (error) => {
+      setError(error.message || "An error occurred");
+    },
+  });
 
   const handleSignin = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -14,18 +26,11 @@ export default function SigninForm() {
     setError("");
 
     const formData = new FormData(e.currentTarget);
+    const email = formData.get("email") as string;
+    const password = formData.get("password") as string;
 
     try {
-      const res = await fetch("/api/login", {
-        method: "POST",
-        body: formData,
-      });
-
-      if (!res.ok) {
-        throw new Error("Invalid credentials or server error");
-      }
-
-      window.location.href = "/"; // Redirect on successful login
+      signInMutation.mutate({ email, password }); // 调用 tRPC 的 signIn API
     } catch (err) {
       setError((err as Error).message || "An error occurred");
     } finally {

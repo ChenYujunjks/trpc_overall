@@ -3,10 +3,22 @@
 import { useState } from "react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
+import { trpc } from "@/components/provider";
 
 export default function SignupForm() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+
+  // tRPC Mutation
+  const signUpMutation = trpc.signUp.useMutation({
+    onSuccess: (data) => {
+      console.log(data.message); // Optional: 可以显示成功消息
+      window.location.href = "/"; // Redirect after signup
+    },
+    onError: (error) => {
+      setError(error.message || "An error occurred");
+    },
+  });
 
   const handleSignup = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -14,18 +26,11 @@ export default function SignupForm() {
     setError("");
 
     const formData = new FormData(e.currentTarget);
+    const email = formData.get("email") as string;
+    const password = formData.get("password") as string;
 
     try {
-      const res = await fetch("/api/register", {
-        method: "POST",
-        body: formData,
-      });
-
-      if (!res.ok) {
-        throw new Error("Email already exists or server error");
-      }
-
-      window.location.href = "/"; // Redirect on successful signup
+      signUpMutation.mutate({ email, password }); // 调用 tRPC 的 signUp API
     } catch (err) {
       setError((err as Error).message || "An error occurred");
     } finally {

@@ -1,7 +1,7 @@
 import { getUser } from "@/server/auth/getUser";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
-import { logout } from "@/server/auth/logout";
+import { logout } from "@/server/auth/actions/signout";
 
 export default async function HomePage() {
   const user = await getUser(); // 调用 getUser 获取用户信息
