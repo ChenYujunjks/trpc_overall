@@ -1,10 +1,10 @@
 import { db } from "@/server/db";
 import { userTable } from "@/server/db/schema";
 import { lucia } from "@/server/auth";
+import { cookies } from "next/headers";
 import { generateId } from "lucia";
 import { TRPCError } from "@trpc/server";
 import { SignUpFormSchema } from "@/lib/types";
-import { cookies } from "next/headers";
 
 /**
  * 用户注册逻辑
