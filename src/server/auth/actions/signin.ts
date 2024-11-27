@@ -10,6 +10,8 @@ import { SignInFormSchema } from "@/lib/types";
  * @param input - 包含 email 和 password 的登录信息
  * @returns 返回会话 ID 和成功消息
  */
+
+//  (input: z.infer<typeof SignInFormSchema>)
 export const signIn = async (input: { email: string; password: string }) => {
   // 使用 SignInFormSchema 验证输入
   const { email, password } = SignInFormSchema.parse(input);
