@@ -1,62 +1,105 @@
 "use client";
 
 import { useState } from "react";
+import { z } from "zod";
+import { zodResolver } from "@hookform/resolvers/zod";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { SignUpFormSchema } from "@/lib/types"; // 引入复用的校验规则
 import { trpc } from "@/components/provider";
+import { useForm } from "react-hook-form";
 
-export default function SignupForm() {
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState("");
+export default function SignUpPage() {
+  const [error, setError] = useState<string | null>(null);
+
+  // 初始化 react-hook-form
+  const form = useForm<z.infer<typeof SignUpFormSchema>>({
+    mode: "all",
+    resolver: zodResolver(SignUpFormSchema),
+  });
 
   // tRPC Mutation
   const signUpMutation = trpc.signUp.useMutation({
-    onSuccess: (data) => {
-      console.log(data.message); // Optional: 可以显示成功消息
-      window.location.href = "/"; // Redirect after signup
+    onSuccess: () => {
+      window.location.href = "/"; // 注册成功后跳转
     },
     onError: (error) => {
       setError(error.message || "An error occurred");
     },
   });
 
-  const handleSignup = async (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    setLoading(true);
-    setError("");
-
-    const formData = new FormData(e.currentTarget);
-    const email = formData.get("email") as string;
-    const password = formData.get("password") as string;
-
-    try {
-      signUpMutation.mutate({ email, password }); // 调用 tRPC 的 signUp API
-    } catch (err) {
-      setError((err as Error).message || "An error occurred");
-    } finally {
-      setLoading(false);
-    }
+  const handleSubmit = (data: z.infer<typeof SignUpFormSchema>) => {
+    setError(null);
+    signUpMutation.mutate(data); // 调用 tRPC 的 signUp API
   };
 
   return (
-    <form onSubmit={handleSignup} className="space-y-4 max-w-md mx-auto">
-      <h1 className="text-2xl font-bold">Sign Up</h1>
-
-      <div className="space-y-2">
-        <Input name="email" type="email" placeholder="Email" required />
-        <Input
-          name="password"
-          type="password"
-          placeholder="Password"
-          required
-        />
-      </div>
-
-      {error && <p className="text-red-500">{error}</p>}
-
-      <Button type="submit" disabled={loading}>
-        {loading ? "Signing up..." : "Sign Up"}
-      </Button>
-    </form>
+    <div className="flex min-h-screen items-center justify-center bg-gray-100 p-4">
+      <Card className="w-full max-w-md shadow-lg">
+        <CardHeader>
+          <CardTitle className="text-center text-2xl font-bold">
+            Sign Up
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <Form {...form}>
+            <form
+              onSubmit={form.handleSubmit(handleSubmit)}
+              className="space-y-4"
+            >
+              <FormField
+                control={form.control}
+                name="email"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Email</FormLabel>
+                    <FormControl>
+                      <Input placeholder="example@example.com" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="password"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Password</FormLabel>
+                    <FormControl>
+                      <Input type="password" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              {error && (
+                <Alert variant="destructive">
+                  <AlertTitle>Error</AlertTitle>
+                  <AlertDescription>{error}</AlertDescription>
+                </Alert>
+              )}
+              <Button
+                disabled={!SignUpFormSchema.safeParse(form.getValues()).success}
+                type="submit"
+                className="w-full"
+              >
+                Submit
+              </Button>
+            </form>
+          </Form>
+        </CardContent>
+      </Card>
+    </div>
   );
 }
