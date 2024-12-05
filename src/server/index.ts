@@ -3,7 +3,7 @@ import { SignUpFormSchema, SignInFormSchema } from "@/lib/types";
 import { createTRPCRouter } from "./context";
 import { signUp } from "@/server/auth/actions/signup";
 import { signIn } from "@/server/auth/actions/signin";
-import { publicProcedure, protectedProcedure } from "./context";
+import { publicProcedure } from "./context";
 // 初始化 tRPC
 const factorial = (n: number): number => {
   if (n === 0) return 1;
