@@ -1,5 +1,7 @@
 import "@/style/globals.css";
 import { Provider } from "@/components/provider";
+import { ThemeProvider } from "@/components/themeProvider";
+import { ThemeToggle } from "@/components/themeToggle";
 
 export const metadata = {
   title: "Flights",
@@ -14,7 +16,9 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body>
-        <Provider>{children}</Provider>
+        <Provider>
+          <ThemeProvider><ThemeToggle />{children}</ThemeProvider>
+        </Provider>
       </body>
     </html>
   );

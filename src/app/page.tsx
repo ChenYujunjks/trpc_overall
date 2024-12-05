@@ -3,12 +3,14 @@ import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { logout } from "@/server/auth/actions/signout";
 
+
 export default async function HomePage() {
   const user = await getUser(); // 调用 getUser 获取用户信息
   console.log("user:", user);
   return (
     <div className="flex flex-col items-center justify-center min-h-screen space-y-6">
       <h1 className="text-3xl font-bold">Welcome to Our App</h1>
+      
       {user ? (
         <div className="space-y-4 text-center">
           <p className="text-xl">Welcome, {user.email}!</p>

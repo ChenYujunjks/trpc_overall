@@ -15,9 +15,9 @@ export const appRouter = createTRPCRouter({
   calculateFactorial: publicProcedure
     .input(z.number().int().min(0)) // 输入必须是非负整数
     .mutation(({ input }) => {
-      if (input > 10) {
+      if (input > 15) {
         throw new Error(
-          "Number too large. Please provide a number less than or equal to 10."
+          "Number too large. Please provide a number less than or equal to 15."
         );
       }
       return { result: factorial(input) };
